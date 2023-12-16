@@ -37,29 +37,30 @@ def possible_moves(board):
              moves.append(key)
     return moves
 
+#returns a valid move play for the given possible moves
 def smart_move(number, possibleMoves):
     move = []
     tempNum = number
+    
+    #tries to chose the highest valid number
     if tempNum in possibleMoves:
         move.append(tempNum)
         return move
+    
+    #if not then run 2 sum untill a valid combo is found
     else:
         seen = {}
         for i in range(len(possibleMoves)):
             result = number - possibleMoves[i]
             if result in seen:
-                print("appending ", possibleMoves[i])
+                #print("appending ", possibleMoves[i])
                 move.append(possibleMoves[i])
-                print("appending ", possibleMoves[seen[result]])
+                #print("appending ", possibleMoves[seen[result]])
                 move.append(possibleMoves[seen[result]])
                 return move
             seen[possibleMoves[i]] = i
     return move
-            
-    
-    
-    
-    
+             
     
 #generates a random move from the possible moves
 #returns a valid move set, if no valid move set then returns a list containing 0
@@ -106,11 +107,13 @@ def monte_move(number, possibleMoveList):
     else:
         return move
     
+#a simpler random algorithm to generate a moveset
 def better_monte_move(number, possibleMoves):
     tries = 1000
     found = False
     sample = []
     
+    #choses random possible number sets until the sum is equal to the number
     while tries > 0 and not found:
         sample = random.sample(possibleMoves,randint(1,min(4, len(possibleMoves))))
         #print("trying: ", sample)
@@ -124,8 +127,17 @@ def better_monte_move(number, possibleMoves):
     
     return sample
         
+
+#extract data from file
+def extract(filenum):
+    filename = str(filenum) + ".txt"
+    file = open(filename, "a+")
     
-samplesize = 10000
+    print("test")
+    
+
+# ------------------- MAIN -----------------------
+samplesize = 1
 tries = samplesize 
 wins = 0    
 loss = 0
