@@ -47,7 +47,7 @@ def smart_move(number, possibleMoves):
         move.append(tempNum)
         return move
     
-    #if not then run 2 sum untill a valid combo is found
+    #if not then run 2 sum until a valid combo is found
     else:
         seen = {}
         for i in range(len(possibleMoves)):
