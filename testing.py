@@ -130,46 +130,114 @@ def better_monte_move(number, possibleMoves):
 
 #extract data from file
 def extract(filenum):
+    #opening the file
     filename = str(filenum) + ".txt"
-    file = open(filename, "a+")
+    file = open(filename, "r")
     
-    print("test")
+    #reading in all the lines
+    lines = file.readlines()
+    
+    #initalize the number array to check for valid moves
+    nums = []
+    for i in range(2,13):
+        nums.append(str(i))
+        
+    #parcing through the lines and appending the data to a list
+    moveset = []
+    i = 0
+    for line in lines:          #for each line
+        line = line.split(".")  #split the line at "."
+        moveset.append([])      #initalize a new index for the moveset
+        for word in line:       
+            if word[-1] == ",":
+                temp = []
+                word = word.split(",")
+                for char in word:
+                    if char in nums:
+                        #print(char)
+                        temp.append(int(char))
+                #print(temp)
+                moveset[i].append(temp)
+            else:
+                moveset[i].append(int(word))
+        i += 1
+    #print(moveset)
+    return moveset
+
+#takes in a list of data and writes it to the file
+def write_file(data, filenum):
+    
+    #opening the file to write to
+    filename = str(filenum) + ".txt"
+    file = open(filename, "w")
+    
+    #for each line of data
+    for line in data:
+        array = line[0] #seperate the move
+        move = ""       #write the move to a string
+        for num in array:
+            move = move + str(num) + ","
+        writeLine = move + "." + str(line[1]) + "." + str(line[2]) + "\n"
+        file.write(writeLine) 
     
 
 # ------------------- MAIN -----------------------
-samplesize = 1
+samplesize = 1000
 tries = samplesize 
 wins = 0    
 loss = 0
+writeCol = 2    #the colum to tally up, W/L 1/2
 
 while tries > 0:
     init_board(board)
     playing = True
+    diceRolls = []
+    moveHistory = []
 
+    print("running sample #",samplesize - tries)
     while playing:
         #print("The current board is:")
         #print(board)
         diceRoll = roll_dice()
-        print("rolled dice: ", diceRoll)
+        #print("rolled dice: ", diceRoll)
+        diceRolls.append(diceRoll)
+        
         possibleMoves = possible_moves(board)
-        print("the possible moves are: ", possibleMoves)
-        moves = smart_move(diceRoll, possibleMoves)
-        print("monte has choosen: ",moves)
+        #print("the possible moves are: ", possibleMoves)
+        
+        moves = better_monte_move(diceRoll, possibleMoves)
+        #print("monte has choosen: ",moves)
+        moves.sort()
+        #print(moves)
+        moveHistory.append(moves)
+        
         
         if len(moves) > 0:
             for move in moves:
                 if move in board:
                     board = execute_move(board, move)
                     
-        print("checking win...")
+        #print("checking win...")
         if check_win(board) is True:
-            print("won")
+            #print("won")
             playing = False
             wins = wins + 1
+            writeCol = 1
         if len(moves) == 0:
-            print("loss")
+            #print("loss")
             playing = False
             loss = loss + 1
+            writeCol = 2
+    
+    #adding results to the files     
+    for index in range(len(moveHistory)):
+        data = extract(diceRolls[index])    #extract data from file
+        for line in data:
+            if line[0] == moveHistory[index]:   #if move is similar
+                line[writeCol] += 1 #increment win/loss
+        write_file(data, diceRolls[index])  #write the data
+    #print("dice rolls: ",diceRolls)
+    #print("move history: ",moveHistory)
     
     tries = tries - 1
     

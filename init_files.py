@@ -91,9 +91,7 @@ def find_2sum(target):
         seen[possibleMoves[i]] = i
         
     return moveset
-    
-    
-        
+         
 #given a file number to read from, reads in the data as a 2d array
 #returns a list containing the movesets, wins, losses in the following format
 '''
@@ -132,9 +130,9 @@ def read_file(filenum):
                 word = word.split(",")
                 for char in word:
                     if char in nums:
-                        print(char)
+                        #print(char)
                         temp.append(int(char))
-                print(temp)
+                #print(temp)
                 moveset[i].append(temp)
             else:
                 moveset[i].append(int(word))
@@ -142,7 +140,29 @@ def read_file(filenum):
     #print(moveset)
     return moveset
 
+#takes in a list of data and writes it to the file
+def write_file(data, filenum):
+    
+    #opening the file to write to
+    filename = str(filenum) + ".txt"
+    file = open(filename, "w")
+    
+    #for each line of data
+    for line in data:
+        array = line[0] #seperate the move
+        move = ""       #write the move to a string
+        for num in array:
+            move = move + str(num) + ","
+        writeLine = move + "." + str(line[1]) + "." + str(line[2]) + "\n"
+        file.write(writeLine)        
+
 #--------------MAIN-------------
 for i in range(2,13):
     init_file(i)
     
+'''
+file12 = read_file(12)
+file12[1][1] = 3
+print(file12)
+write_file(file12, 12)
+'''
