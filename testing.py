@@ -37,6 +37,14 @@ def possible_moves(board):
              moves.append(key)
     return moves
 
+#given a move and the list of possible moves, check if the move is valid
+# return T/F
+def validate_move(move, possibleMoves):
+    for num in move:
+        if num not in possibleMoves:
+            return False
+    return True
+
 #returns a valid move play for the given possible moves
 def smart_move(number, possibleMoves):
     move = []
@@ -60,7 +68,74 @@ def smart_move(number, possibleMoves):
                 return move
             seen[possibleMoves[i]] = i
     return move
-             
+        
+#using the given data, return the weights 
+def weight(data):
+    weights = []
+    percents = []
+    total = 0
+    
+    #get the raw percentages
+    for line in data:
+        percent = line[1] / line[2]
+        percents.append(percent)
+        total += percent
+        
+    #using the raw percentages get the total percent of the moveset
+    for num in percents:
+        weights.append(num / total)
+        
+    return weights
+        
+    
+#given the data, return a list of the moves only
+def extract_moves(data):
+    moves = []
+    for line in data:
+        moves.append(line[0])
+    
+    return moves
+    
+    
+#using the dataset, return the "best" move depending on weight     
+def ai_move(number, possibleMoves):
+    move = []
+    validMoves = []
+    filenum = number
+    
+    data = extract(filenum)
+    moves = extract_moves(data)
+    weights = weight(data)
+    
+    #create a list of valid moves
+    for checkMove in moves:
+        validMove = True
+        for num in checkMove:
+            if num not in possibleMoves:
+                validMove = False
+        if validMove:
+            validMoves.append(checkMove)
+            
+    #chose a weighted valid random move
+    if len(validMoves) > 0:
+        tries = 10
+        while tries > 0:
+            temp = random.choices(moves, weights)
+            move.append(temp[0])
+
+            #check if move is valid
+            if move[0] in validMoves:
+                return move[0]
+            else:
+                tries -= 1
+                move = []
+    
+    #if no valid move found and there is a possible valid move, choose  
+    if len(validMoves) > 0 and len(move) < 1:
+        return random.choice(validMoves)
+    
+    return move
+    
     
 #generates a random move from the possible moves
 #returns a valid move set, if no valid move set then returns a list containing 0
@@ -182,7 +257,7 @@ def write_file(data, filenum):
     
 
 # ------------------- MAIN -----------------------
-samplesize = 1000
+samplesize = 100000
 tries = samplesize 
 wins = 0    
 loss = 0
@@ -205,8 +280,12 @@ while tries > 0:
         possibleMoves = possible_moves(board)
         #print("the possible moves are: ", possibleMoves)
         
-        moves = better_monte_move(diceRoll, possibleMoves)
+        moves = ai_move(diceRoll, possibleMoves)
         #print("monte has choosen: ",moves)
+        
+        if validate_move(moves, possibleMoves) is False:
+            print("INVALID MOVE")
+        
         moves.sort()
         #print(moves)
         moveHistory.append(moves)
